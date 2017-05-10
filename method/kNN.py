@@ -1,8 +1,9 @@
 '''
 kNN: k Nearest Neighbors
 
-Input:      inX: vector to compare to existing dataset (1xN)
-            dataSet: size m data set of known vectors (NxM)
+Input:      simple matrix is 1000*3, N=3, M is the number of simple woking as reference 
+						inX: vector to compare to existing dataset (1x3)
+            dataSet: size m data set of known vectors (3xM)
             labels: data set labels (1xM vector)
             k: number of neighbors to use for comparison (should be an odd number)
             
@@ -18,9 +19,9 @@ def classify0(inX, dataSet, labels, k):
     dataSetSize = dataSet.shape[0]
     diffMat = tile(inX, (dataSetSize,1)) - dataSet
     sqDiffMat = diffMat**2
-    sqDistances = sqDiffMat.sum(axis=1)
+    sqDistances = sqDiffMat.sum(axis=1) #sum distance of 3 fields
     distances = sqDistances**0.5
-    sortedDistIndicies = distances.argsort()     
+    sortedDistIndicies = distances.argsort() #sort list and return corresponding index
     classCount={}          
     for i in range(k):
         voteIlabel = labels[sortedDistIndicies[i]]
@@ -36,6 +37,7 @@ def createDataSet():
 '''
 datingTestSet.txt structure
 flight distance per year | video game time percentage | icecream consumed per week | result 
+returnMat is 1000*3 matrix, classLabelVector is 1000*1 vector
 '''
 def file2matrix(filename):
     love_dictionary={'largeDoses':3, 'smallDoses':2, 'didntLike':1}
@@ -68,8 +70,8 @@ def autoNorm(dataSet):
     return normDataSet, ranges, minVals
    
 def datingClassTest():
-    hoRatio = 0.50      #hold out 10%
-    datingDataMat,datingLabels = file2matrix('datingTestSet2.txt')       #load data setfrom file
+    hoRatio = 0.90      #hold out 10%
+    datingDataMat,datingLabels = file2matrix('../data/datingTestSet.txt')       #load data setfrom file
     normMat, ranges, minVals = autoNorm(datingDataMat)
     m = normMat.shape[0]
     numTestVecs = int(m*hoRatio)
@@ -87,7 +89,7 @@ def classifyPerson():
                                   "percentage of time spent playing video games?"))
     ffMiles = float(raw_input("frequent flier miles earned per year?"))
     iceCream = float(raw_input("liters of ice cream consumed per year?"))
-    datingDataMat, datingLabels = file2matrix('datingTestSet2.txt')
+    datingDataMat, datingLabels = file2matrix('../data/datingTestSet.txt')
     normMat, ranges, minVals = autoNorm(datingDataMat)
     inArr = array([ffMiles, percentTats, iceCream, ])
     classifierResult = classify0((inArr - \
@@ -105,7 +107,7 @@ def img2vector(filename):
 
 def handwritingClassTest():
     hwLabels = []
-    trainingFileList = listdir('trainingDigits')           #load the training set
+    trainingFileList = listdir('../data/trainingDigits')           #load the training set
     m = len(trainingFileList)
     trainingMat = zeros((m,1024))
     for i in range(m):
@@ -113,15 +115,15 @@ def handwritingClassTest():
         fileStr = fileNameStr.split('.')[0]     #take off .txt
         classNumStr = int(fileStr.split('_')[0])
         hwLabels.append(classNumStr)
-        trainingMat[i,:] = img2vector('trainingDigits/%s' % fileNameStr)
-    testFileList = listdir('testDigits')        #iterate through the test set
+        trainingMat[i,:] = img2vector('../data/trainingDigits/%s' % fileNameStr)
+    testFileList = listdir('../data/testDigits')        #iterate through the test set
     errorCount = 0.0
     mTest = len(testFileList)
     for i in range(mTest):
         fileNameStr = testFileList[i]
         fileStr = fileNameStr.split('.')[0]     #take off .txt
         classNumStr = int(fileStr.split('_')[0])
-        vectorUnderTest = img2vector('testDigits/%s' % fileNameStr)
+        vectorUnderTest = img2vector('../data/testDigits/%s' % fileNameStr)
         classifierResult = classify0(vectorUnderTest, trainingMat, hwLabels, 3)
         print "the classifier came back with: %d, the real answer is: %d" % (classifierResult, classNumStr)
         if (classifierResult != classNumStr): errorCount += 1.0
