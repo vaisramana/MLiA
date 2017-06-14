@@ -17,7 +17,7 @@ train = optimizer.minimize(loss)
 x_train = [1,2,3,4]
 y_train = [0,-1,-2,-3]
 # training loop
-init = tf.initialize_all_variables()
+init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init) # reset values to wrong
 for i in range(10000):
